@@ -76,38 +76,6 @@ const spinnerContainer = document.createElement("div");
 spinnerContainer.innerHTML = spinnerMarkup;
 document.body.appendChild(spinnerContainer);
 
-// FETCH CAT DATA
-const getJSON = async function (url) {
-  try {
-    // Send GET request to API with headers
-    const res = await fetch(url, {
-      method: "GET",
-      headers: {
-        "X-Api-Key": "o2UXq8pWVEg5rGLbiYeGzw==9XIV2HjOrjRzadc5",
-      },
-    });
-
-    if (!res.ok)
-      throw new Error("Oops! Something went wrong. Please try again later.");
-
-    const data = await res.json();
-
-    if (!data.length)
-      throw new Error(`Cannot find breed with that name. Try another! 🐈`);
-
-    return data;
-  } catch (err) {
-    // Handle network errors separately (e.g., lost internet connection)
-    if (err instanceof TypeError && err.message.includes("Failed to fetch")) {
-      throw new Error(
-        "Network error! Please check your internet connection..."
-      );
-    }
-
-    throw err;
-  }
-};
-
 ////////////////////////////////////////////////////////////////////////
 
 // SUBMIT FORM
@@ -135,6 +103,33 @@ formSearchCat.addEventListener("submit", function (e) {
   getCat(catName);
 });
 
+// FETCH CAT DATA
+const getJSON = async function (url) {
+  try {
+    // Send GET request to API with headers
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "X-Api-Key": "o2UXq8pWVEg5rGLbiYeGzw==9XIV2HjOrjRzadc5",
+      },
+    });
+
+    if (!res.ok)
+      throw new Error("Oops! Something went wrong. Please try again later.");
+
+    return res.json();
+  } catch (err) {
+    // Handle network errors separately (e.g., lost internet connection)
+    if (err instanceof TypeError && err.message.includes("Failed to fetch")) {
+      throw new Error(
+        "Network error! Please check your internet connection..."
+      );
+    }
+
+    throw err;
+  }
+};
+
 // GET CAT
 const getCat = async function (breed) {
   try {
@@ -143,7 +138,9 @@ const getCat = async function (breed) {
       `https://api.api-ninjas.com/v1/cats?name=${breed}`
     );
 
-    // Render cat data
+    if (!data.length)
+      throw new Error(`Cannot find breed with that name. Try another! 🐈`);
+
     displayCat(data[0]);
   } catch (err) {
     console.error("Error fetching cat data:", err.message);
