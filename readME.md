@@ -29,7 +29,7 @@ This application lets users search for a **cat breed** by name, and it displays:
 
 1. **User submits a breed name** through the form.
 2. **API call** is made to the **API Ninjas Cat API** to retrieve breed details.
-3. **Results are displayed** including a cat image, stats (origin, intelligence, etc.), and related information about the breed.
+3. **Results are displayed** including a cat image, stats, and related information about the breed.
 4. **Error handling**: If no results are found, users are notified with a friendly message! 😿
 
 ## 🌟 Enjoy exploring the world of cats! 😻
