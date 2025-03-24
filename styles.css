@@ -21,8 +21,8 @@ main {
 }
 
 body {
-  font-family: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-    "Lucida Sans", sans-serif;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+    'Lucida Sans', sans-serif;
   background-color: #274c44;
   background-image: linear-gradient(to bottom left, #4f867a, #4f867a, #1e3b34);
 }
@@ -74,7 +74,7 @@ main {
   color: #19322d;
   background-color: rgb(217, 245, 238);
   font-size: 1.1rem;
-  border: 5px solid #182423;
+  border: 4px solid #1b2a29;
   border-radius: 4px;
   overflow: hidden;
   box-shadow: -10px 14px 18px 4px #0508084b;
@@ -108,7 +108,7 @@ main {
     rgb(217, 245, 238),
     rgb(190, 229, 219)
   );
-  border: 5px solid #182423;
+  border: 4px solid #1b2a29;
   border-radius: 4px;
   box-shadow: -10px 14px 18px 2px #0508084b;
   padding: 50px 40px 30px;

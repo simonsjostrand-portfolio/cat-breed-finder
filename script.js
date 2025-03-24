@@ -8,6 +8,7 @@ const catRelatives = {
   american_shorthair: 'British Shorthair',
   american_wirehair: 'American Shorthair',
   arabian_mau: 'Egyptian Mau',
+  australian_mist: 'Burmese',
   balinese: 'Siamese',
   bengal: 'Egyptian Mau',
   birman: 'Ragdoll',
@@ -79,18 +80,19 @@ const spinnerContainer = document.createElement('div');
 spinnerContainer.innerHTML = spinnerMarkup;
 document.body.appendChild(spinnerContainer);
 
+////////////////////////////////////////////////////////////////////////
+
+// Utility functions
+const formatName = name => name.toLowerCase().replace(/[\s-]+/g, '_');
+
 const showSpinner = () =>
   (spinnerContainer.querySelector('.spinner').style.display = 'block');
 
 const hideSpinner = () =>
   (spinnerContainer.querySelector('.spinner').style.display = 'none');
 
-////////////////////////////////////////////////////////////////////////
-
-// FETCH CAT DATA (Utility function)
 const getJSON = async function (url) {
   try {
-    // Send GET request to API with headers
     const res = await fetch(url, {
       method: 'GET',
       headers: {
@@ -114,10 +116,10 @@ const getJSON = async function (url) {
   }
 };
 
+////////////////////////////////////////////////////////////////////////
+
 // DISPLAY CAT INFO
 const displayCatInfo = function (cat) {
-  const formatName = name => name.toLowerCase().replace(/\s+/g, '_');
-
   // Clone cat object
   const catObj = structuredClone(cat);
 
@@ -203,7 +205,7 @@ const displayCat = function (cat) {
 // GET CAT
 const getCat = async function (breed) {
   try {
-    const data = await getJSON(
+    const [data = []] = await getJSON(
       `https://api.api-ninjas.com/v1/cats?name=${breed}`
     );
 
@@ -212,7 +214,7 @@ const getCat = async function (breed) {
         `😿 Sorry, couldn't find that breed right now... Try another!`
       );
 
-    displayCat(data[0]);
+    displayCat(data);
   } catch (err) {
     console.error('Error fetching cat data:', err.message);
 
