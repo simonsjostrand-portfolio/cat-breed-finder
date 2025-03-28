@@ -69,27 +69,42 @@ const containerCat = document.querySelector('.cat_container');
 const formSearchCat = document.querySelector('.form_search-cat');
 const inputSearchCat = document.getElementById('search-cat');
 
-// Spinner
-const spinnerMarkup = `
+// Create and append spinner
+const createSpinner = function () {
+  const spinnerContainer = document.createElement('div');
+
+  const spinnerMarkup = `
   <div class="spinner">
     <div class="spin"></div>
   </div>
 `;
 
-const spinnerContainer = document.createElement('div');
-spinnerContainer.innerHTML = spinnerMarkup;
-document.body.appendChild(spinnerContainer);
+  spinnerContainer.innerHTML = spinnerMarkup;
+  document.body.appendChild(spinnerContainer);
+};
+createSpinner();
 
 ////////////////////////////////////////////////////////////////////////
 
 // Utility functions
-const formatName = name => name.toLowerCase().replace(/[\s-]+/g, '_');
+const hideSpinner = () =>
+  (spinnerContainer.querySelector('.spinner').style.display = 'none');
 
 const showSpinner = () =>
   (spinnerContainer.querySelector('.spinner').style.display = 'block');
 
-const hideSpinner = () =>
-  (spinnerContainer.querySelector('.spinner').style.display = 'none');
+const hideUIMessages = function () {
+  headingWelcome.style.display = 'none';
+  headingIcon.style.display = 'none';
+  errorMessage.style.display = 'none';
+};
+
+const showErrorMessage = function (err) {
+  errorMessage.style.display = 'block';
+  errorMessage.textContent = err.message;
+};
+
+const formatName = name => name.toLowerCase().replace(/[\s-]+/g, '_');
 
 const getJSON = async function (url) {
   try {
@@ -118,15 +133,26 @@ const getJSON = async function (url) {
 
 ////////////////////////////////////////////////////////////////////////
 
-// DISPLAY CAT INFO
-const displayCatInfo = function (cat) {
+const renderCatInfo = function (cat) {
   // Clone cat object
   const catObj = structuredClone(cat);
 
   // Get closest breed relative
-  const closestRelative = catRelatives[formatName(cat.name)] || 'unknown';
+  const closestCatRelative = catRelatives[formatName(cat.name)] || 'unknown';
 
-  const vocal =
+  // Create and set info elements
+  const infoContainer = document.createElement('article');
+  const info = document.createElement('p');
+  const infoIcon = document.createElement('img');
+
+  infoContainer.classList.add('cat_info');
+  info.classList.add('info');
+  infoIcon.classList.add('cat-icon');
+
+  infoIcon.src = 'cat-icon.svg';
+  infoIcon.alt = 'Cat Icon';
+
+  const vocality =
     catObj.meowing === 1
       ? 'less vocal cats'
       : catObj.meowing === 2
@@ -139,20 +165,8 @@ const displayCatInfo = function (cat) {
       ? 'very vocal'
       : '';
 
-  // Create info elements
-  const infoContainer = document.createElement('article');
-  const info = document.createElement('p');
-  const infoIcon = document.createElement('img');
-
-  infoContainer.classList.add('cat_info');
-  info.classList.add('info');
-  infoIcon.classList.add('cat-icon');
-
-  infoIcon.src = 'cat-icon.svg';
-  infoIcon.alt = 'Cat Icon';
-
   info.textContent = `
-      The ${catObj.name} is ${catObj.length}, and weights between ${catObj.min_weight}-${catObj.max_weight}lbs. They're ${vocal}. Their lifespan ranges from ${catObj.min_life_expectancy} to ${catObj.max_life_expectancy} years. Closest relative is ${closestRelative}.
+      The ${catObj.name} is ${catObj.length}, and weights between ${catObj.min_weight}-${catObj.max_weight}lbs. They're ${vocality}. Their lifespan ranges from ${catObj.min_life_expectancy} to ${catObj.max_life_expectancy} years. Closest relative is ${closestCatRelative}.
       `;
 
   containerCat.insertAdjacentElement('beforeend', infoContainer);
@@ -161,7 +175,7 @@ const displayCatInfo = function (cat) {
 };
 
 // DISPLAY CAT
-const displayCat = function (cat) {
+const renderCat = function (cat) {
   // Get family rating and play rating
   const familyRating = cat.family_friendly;
   const playRating = cat.playfulness;
@@ -170,10 +184,12 @@ const displayCat = function (cat) {
   const heartEmoji = '💚'.repeat(familyRating);
   const playEmoji = '🐈‍⬛'.repeat(playRating);
 
+  // Create img and set attributes
   const img = new Image();
   img.src = cat.image_link;
   img.alt = `Image of a ${cat.name} cat`;
 
+  // Img load event with markup
   img.addEventListener('load', function () {
     const html = `
       <article class="cat">
@@ -196,14 +212,14 @@ const displayCat = function (cat) {
       </article>`;
 
     hideSpinner();
-
     containerCat.insertAdjacentHTML('afterbegin', html);
-    displayCatInfo(cat);
+
+    renderCatInfo(cat);
   });
 };
 
 // GET CAT
-const getCat = async function (breed) {
+const fetchCatData = async function (breed) {
   try {
     const [data = []] = await getJSON(
       `https://api.api-ninjas.com/v1/cats?name=${breed}`
@@ -214,14 +230,12 @@ const getCat = async function (breed) {
         `😿 Sorry, couldn't find that breed right now... Try another!`
       );
 
-    displayCat(data);
+    renderCat(data);
   } catch (err) {
     console.error('Error fetching cat data:', err.message);
 
     hideSpinner();
-
-    errorMessage.style.display = 'block';
-    errorMessage.textContent = err.message;
+    showErrorMessage(err);
   }
 };
 
@@ -229,16 +243,14 @@ const getCat = async function (breed) {
 formSearchCat.addEventListener('submit', function (e) {
   e.preventDefault();
 
-  const catName = inputSearchCat.value.trim();
-
-  headingWelcome.style.display = 'none';
-  headingIcon.style.display = 'none';
-  errorMessage.style.display = 'none';
+  // Get user input
+  const catQuery = inputSearchCat.value.trim();
 
   formSearchCat.reset();
   inputSearchCat.blur();
   containerCat.innerHTML = '';
 
+  hideUIMessages();
   showSpinner();
-  getCat(catName);
+  fetchCatData(catQuery);
 });
