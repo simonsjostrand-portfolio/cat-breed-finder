@@ -1,18 +1,4 @@
-*,
-*::before,
-*::after {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-}
 
-img {
-  display: block;
-  max-inline-size: 100%;
-  max-block-size: auto;
-  border-bottom: 2px solid #182423;
-  margin-block-end: 34px;
-}
 
 html,
 body,
@@ -42,7 +28,7 @@ main {
   margin-block-end: 30px;
 }
 
-.welcome-heading {
+.heading-welcome {
   color: #fffab8;
   font-size: 2.5rem;
 
@@ -183,8 +169,8 @@ main {
   border-radius: 50%;
 
   position: absolute;
-  top: 40%;
-  left: 48.5%;
+  top: 42%;
+  left: 48.4%;
   transform: translate(-50%, -50%);
 
   animation: loadSpin 1s linear infinite;

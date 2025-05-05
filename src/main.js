@@ -1,4 +1,8 @@
-'use strict';
+import { formatName } from './helpers.js';
+import { toggleSpinner } from './helpers.js';
+import { showErrorMessage } from './helpers.js';
+import { hideUIMessages } from './helpers.js';
+import { getJSON } from './helpers.js';
 
 const catRelatives = {
   abyssinian: 'Somali',
@@ -7,10 +11,11 @@ const catRelatives = {
   american_curl: 'Scottish Fold',
   american_shorthair: 'British Shorthair',
   american_wirehair: 'American Shorthair',
+  aphrodite_giant: 'Cyprus',
   arabian_mau: 'Egyptian Mau',
   australian_mist: 'Burmese',
   balinese: 'Siamese',
-  bengal: 'Egyptian Mau',
+  bengal_cats: 'Egyptian Mau',
   birman: 'Ragdoll',
   bombay: 'Burmese',
   british_longhair: 'British Shorthair',
@@ -20,8 +25,10 @@ const catRelatives = {
   chartreux: 'British Shorthair',
   cornish_rex: 'Devon Rex',
   cymric: 'Manx',
+  cyprus: 'Aphrodite Giant',
   chinese_li_hua: 'Oriental Shorthair',
   devon_rex: 'Cornish Rex',
+  donskoy: 'Oriental Shorthair',
   egyptian_mau: 'Bengal',
   european_shorthair: 'British Shorthair',
   exotic_shorthair: 'Persian',
@@ -32,7 +39,7 @@ const catRelatives = {
   korat: 'Russian Blue',
   kurilian_bobtail: 'Japanese Bobtail',
   laPerm: 'Selkirk Rex',
-  maine_coon: 'Norwegian Forest Cat',
+  maine_coon: 'Norwegian Forest',
   manx: 'Cymric',
   munchkin: 'Scottish Fold',
   mekong_mobtail: 'Thai cat',
@@ -46,6 +53,7 @@ const catRelatives = {
   peterbald: 'Sphynx',
   pixie_bob: 'American Bobtail',
   ragdoll_cats: 'Birman',
+  ragamuffin: 'Ragdoll',
   russian_blue: 'Korat',
   savannah: 'Bengal',
   scottish_fold: 'American Curl',
@@ -62,111 +70,48 @@ const catRelatives = {
   turkish_van: 'Turkish Angora',
 };
 
-const headingWelcome = document.querySelector('.welcome-heading');
-const headingIcon = document.querySelector('.heading-icon');
-const errorMessage = document.querySelector('.error-message');
 const containerCat = document.querySelector('.cat_container');
 const formSearchCat = document.querySelector('.form_search-cat');
 const inputSearchCat = document.getElementById('search-cat');
 
-// Create and append spinner
-const createSpinner = function () {
-  const spinnerContainer = document.createElement('div');
-
-  const spinnerMarkup = `
-  <div class="spinner">
-    <div class="spin"></div>
-  </div>
-`;
-
-  spinnerContainer.innerHTML = spinnerMarkup;
-  document.body.appendChild(spinnerContainer);
-};
-createSpinner();
-
-////////////////////////////////////////////////////////////////////////
-
-// Utility functions
-const hideSpinner = () =>
-  (spinnerContainer.querySelector('.spinner').style.display = 'none');
-
-const showSpinner = () =>
-  (spinnerContainer.querySelector('.spinner').style.display = 'block');
-
-const hideUIMessages = function () {
-  headingWelcome.style.display = 'none';
-  headingIcon.style.display = 'none';
-  errorMessage.style.display = 'none';
-};
-
-const showErrorMessage = function (err) {
-  errorMessage.style.display = 'block';
-  errorMessage.textContent = err.message;
-};
-
-const formatName = name => name.toLowerCase().replace(/[\s-]+/g, '_');
-
-const getJSON = async function (url) {
-  try {
-    const res = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'X-Api-Key': 'o2UXq8pWVEg5rGLbiYeGzw==9XIV2HjOrjRzadc5',
-      },
-    });
-
-    if (!res.ok)
-      throw new Error('Oops! Something went wrong. Please try again later.');
-
-    return res.json();
-  } catch (err) {
-    // Handle network errors separately (e.g., lost internet connection)
-    if (err instanceof TypeError && err.message.includes('Failed to fetch')) {
-      throw new Error(
-        'Network error! Please check your internet connection...'
-      );
-    }
-
-    throw err;
-  }
-};
-
 ////////////////////////////////////////////////////////////////////////
 
 const renderCatInfo = function (cat) {
-  // Clone cat object
-  const catObj = structuredClone(cat);
-
-  // Get closest breed relative
-  const closestCatRelative = catRelatives[formatName(cat.name)] || 'unknown';
-
-  // Create and set info elements
   const infoContainer = document.createElement('article');
-  const info = document.createElement('p');
   const infoIcon = document.createElement('img');
+  const info = document.createElement('p');
 
   infoContainer.classList.add('cat_info');
   info.classList.add('info');
   infoIcon.classList.add('cat-icon');
 
-  infoIcon.src = 'cat-icon.svg';
+  infoIcon.src = 'icons/cat-icon.svg';
   infoIcon.alt = 'Cat Icon';
 
   const vocality =
-    catObj.meowing === 1
+    cat.meowing === 1
       ? 'less vocal cats'
-      : catObj.meowing === 2
+      : cat.meowing === 2
       ? 'not very vocal'
-      : catObj.meowing === 3
+      : cat.meowing === 3
       ? 'vocal, but not excessively'
-      : catObj.meowing === 4
+      : cat.meowing === 4
       ? 'quite vocal'
-      : catObj.meowing === 5
+      : cat.meowing === 5
       ? 'very vocal'
       : '';
 
+  // Get closest cat relative
+  const relative = catRelatives[formatName(cat.name)] || 'unknown';
+
   info.textContent = `
-      The ${catObj.name} is ${catObj.length}, and weights between ${catObj.min_weight}-${catObj.max_weight}lbs. They're ${vocality}. Their lifespan ranges from ${catObj.min_life_expectancy} to ${catObj.max_life_expectancy} years. Closest relative is ${closestCatRelative}.
+      The ${cat.name} is ${
+    cat.length === 'Medium' ? 'moderate' : cat.length
+  }, and weights between ${cat.min_weight}-${
+    cat.max_weight
+  }lbs. They're ${vocality}. Their lifespan ranges from ${
+    cat.min_life_expectancy
+  } to ${cat.max_life_expectancy} years. Closest relative is ${relative}.
       `;
 
   containerCat.insertAdjacentElement('beforeend', infoContainer);
@@ -184,7 +129,7 @@ const renderCat = function (cat) {
   const heartEmoji = '💚'.repeat(familyRating);
   const playEmoji = '🐈‍⬛'.repeat(playRating);
 
-  // Create img and set attributes
+  // Create img element and set attributes
   const img = new Image();
   img.src = cat.image_link;
   img.alt = `Image of a ${cat.name} cat`;
@@ -211,36 +156,35 @@ const renderCat = function (cat) {
         </ul>
       </article>`;
 
-    hideSpinner();
+    toggleSpinner(false);
     containerCat.insertAdjacentHTML('afterbegin', html);
 
     renderCatInfo(cat);
   });
 };
 
-// GET CAT
+// GET CAT DATA
 const fetchCatData = async function (breed) {
   try {
-    const [data = []] = await getJSON(
+    const cat = await getJSON(
       `https://api.api-ninjas.com/v1/cats?name=${breed}`
     );
 
-    if (!data.length)
+    if (!cat.length)
       throw new Error(
-        `😿 Sorry, couldn't find that breed right now... Try another!`
+        `😿 Sorry, couldn't find that breed for now... Try another!`
       );
-
-    renderCat(data);
+    renderCat(cat[0]);
   } catch (err) {
     console.error('Error fetching cat data:', err.message);
 
-    hideSpinner();
+    toggleSpinner(false);
     showErrorMessage(err);
   }
 };
 
 // SUBMIT FORM
-formSearchCat.addEventListener('submit', function (e) {
+const handleSubmit = function (e) {
   e.preventDefault();
 
   // Get user input
@@ -251,6 +195,7 @@ formSearchCat.addEventListener('submit', function (e) {
   containerCat.innerHTML = '';
 
   hideUIMessages();
-  showSpinner();
+  toggleSpinner(true);
   fetchCatData(catQuery);
-});
+};
+formSearchCat.addEventListener('submit', handleSubmit);
