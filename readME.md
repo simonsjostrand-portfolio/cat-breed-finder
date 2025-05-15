@@ -33,7 +33,7 @@ This application lets users search for a **cat breed** by name, and it displays:
 4. **Error handling**: If no results are found, users are notified with a friendly message! 😿
 
 ## 🌍 Live Demo
-[Demo here](https://simonsjostrand-portfolio.github.io/cat-breed-finder/)
+[Check it out here](https://simonsjostrand-portfolio.github.io/cat-breed-finder/)
 
 ## 🌟 Enjoy exploring the world of cats! 😻
 
