@@ -5,8 +5,6 @@ const spinner = document.querySelector('.spinner');
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-// Fixa en timeout function, lägg till en config fil med ett URL och timeout seconds (API_URL, TIMEOUT_SEC)
-
 export const formatName = name => name.toLowerCase().replace(/[\s-]+/g, '_');
 
 export const toggleSpinner = show =>
