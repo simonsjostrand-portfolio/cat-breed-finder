@@ -76,16 +76,16 @@ const inputSearchCat = document.getElementById('search-cat');
 
 ////////////////////////////////////////////////////////////////////////
 
-const renderCatInfo = function (cat) {
+const renderCatDetails = function (cat) {
   const infoContainer = document.createElement('article');
   const infoIcon = document.createElement('img');
   const info = document.createElement('p');
 
   infoContainer.classList.add('cat_info');
-  info.classList.add('info');
   infoIcon.classList.add('cat-icon');
+  info.classList.add('info');
 
-  infoIcon.src = 'icons/cat-icon.svg';
+  infoIcon.src = 'src/img/cat-icon.svg';
   infoIcon.alt = 'Cat Icon';
 
   const vocality =
@@ -116,10 +116,9 @@ const renderCatInfo = function (cat) {
 
   containerCat.insertAdjacentElement('beforeend', infoContainer);
   infoContainer.appendChild(infoIcon);
-  infoContainer.insertAdjacentElement('beforeend', info);
+  infoContainer.appendChild(info);
 };
 
-// DISPLAY CAT
 const renderCat = function (cat) {
   // Get family rating and play rating
   const familyRating = cat.family_friendly;
@@ -159,7 +158,7 @@ const renderCat = function (cat) {
     toggleSpinner(false);
     containerCat.insertAdjacentHTML('afterbegin', html);
 
-    renderCatInfo(cat);
+    renderCatDetails(cat);
   });
 };
 
@@ -174,16 +173,15 @@ const fetchCatData = async function (breed) {
       throw new Error(
         `😿 Sorry, couldn't find that breed for now... Try another!`
       );
+
     renderCat(cat[0]);
   } catch (err) {
-    console.error('Error fetching cat data:', err.message);
-
     toggleSpinner(false);
     showErrorMessage(err);
   }
 };
 
-// SUBMIT FORM
+// Event handler
 const handleSubmit = function (e) {
   e.preventDefault();
 
@@ -198,4 +196,6 @@ const handleSubmit = function (e) {
   toggleSpinner(true);
   fetchCatData(catQuery);
 };
+
+// Event listener
 formSearchCat.addEventListener('submit', handleSubmit);
