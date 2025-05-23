@@ -169,7 +169,7 @@ const fetchCatData = async function (breed) {
       `https://api.api-ninjas.com/v1/cats?name=${breed}`
     );
 
-    if (!cat.length)
+    if (!cat || (Array.isArray(cat) && !cat.length))
       throw new Error(
         `😿 Sorry, couldn't find that breed for now... Try another!`
       );
@@ -185,16 +185,15 @@ const fetchCatData = async function (breed) {
 const handleSubmit = function (e) {
   e.preventDefault();
 
-  // Get user search
+  hideUIMessages();
+  toggleSpinner(true);
+  containerCat.innerHTML = '';
+
+  // Get search query
   const query = inputSearchCat.value.trim();
   if (!query) return;
 
   formSearchCat.reset();
-  inputSearchCat.blur();
-  containerCat.innerHTML = '';
-
-  hideUIMessages();
-  toggleSpinner(true);
   fetchCatData(query);
 };
 
