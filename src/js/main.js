@@ -185,8 +185,9 @@ const fetchCatData = async function (breed) {
 const handleSubmit = function (e) {
   e.preventDefault();
 
-  // Get user input
-  const catQuery = inputSearchCat.value.trim();
+  // Get user search
+  const query = inputSearchCat.value.trim();
+  if (!query) return;
 
   formSearchCat.reset();
   inputSearchCat.blur();
@@ -194,7 +195,7 @@ const handleSubmit = function (e) {
 
   hideUIMessages();
   toggleSpinner(true);
-  fetchCatData(catQuery);
+  fetchCatData(query);
 };
 
 // Event listener
