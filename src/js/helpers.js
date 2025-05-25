@@ -1,23 +1,20 @@
-const headingIcon = document.querySelector('.heading-icon');
-const headingWelcome = document.querySelector('.heading-welcome');
-const errorMessage = document.querySelector('.error-message');
-const spinner = document.querySelector('.spinner');
-
-////////////////////////////////////////////////////////////////////////////////////
-
 export const formatName = name => name.toLowerCase().replace(/[\s-]+/g, '_');
 
-export const toggleSpinner = show =>
+export const toggleSpinner = (show, spinner) =>
   (spinner.style.display = show ? 'block' : 'none');
 
-export const showErrorMessage = function (err) {
+export const showErrorMessage = function (err, errorMessage) {
   errorMessage.style.display = 'block';
   errorMessage.textContent = err.message;
 };
 
-export const hideUIMessages = function () {
-  headingWelcome.style.display = 'none';
+export const hideUIMessages = function (
+  headingIcon,
+  headingWelcome,
+  errorMessage
+) {
   headingIcon.style.display = 'none';
+  headingWelcome.style.display = 'none';
   errorMessage.style.display = 'none';
 };
 

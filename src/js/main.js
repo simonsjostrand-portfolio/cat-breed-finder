@@ -70,6 +70,10 @@ const catRelatives = {
   turkish_van: 'Turkish Angora',
 };
 
+const headingIcon = document.querySelector('.heading-icon');
+const headingWelcome = document.querySelector('.heading-welcome');
+const errorMessage = document.querySelector('.error-message');
+const spinner = document.querySelector('.spinner');
 const containerCat = document.querySelector('.cat_container');
 const formSearchCat = document.querySelector('.form_search-cat');
 const inputSearchCat = document.getElementById('search-cat');
@@ -155,7 +159,7 @@ const renderCat = function (cat) {
         </ul>
       </article>`;
 
-    toggleSpinner(false);
+    toggleSpinner(false, spinner);
     containerCat.insertAdjacentHTML('afterbegin', html);
 
     renderCatDetails(cat);
@@ -176,8 +180,8 @@ const fetchCatData = async function (breed) {
 
     renderCat(cat[0]);
   } catch (err) {
-    toggleSpinner(false);
-    showErrorMessage(err);
+    toggleSpinner(false, spinner);
+    showErrorMessage(err, errorMessage);
   }
 };
 
@@ -185,8 +189,8 @@ const fetchCatData = async function (breed) {
 const handleSubmit = function (e) {
   e.preventDefault();
 
-  hideUIMessages();
-  toggleSpinner(true);
+  hideUIMessages(headingIcon, headingWelcome, errorMessage);
+  toggleSpinner(true, spinner);
   containerCat.innerHTML = '';
 
   // Get search query

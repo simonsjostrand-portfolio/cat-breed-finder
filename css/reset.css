@@ -10,6 +10,6 @@ img {
   display: block;
   max-inline-size: 100%;
   max-block-size: auto;
-  border-bottom: 2px solid #182423;
+  border-block-end: 2px solid #182423;
   margin-block-end: 34px;
 }
