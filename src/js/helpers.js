@@ -3,21 +3,6 @@ export const formatName = name => name.toLowerCase().replace(/[\s-]+/g, '_');
 export const toggleSpinner = (show, spinner) =>
   (spinner.style.display = show ? 'block' : 'none');
 
-export const showErrorMessage = function (err, errorMessage) {
-  errorMessage.style.display = 'block';
-  errorMessage.textContent = err.message;
-};
-
-export const hideUIMessages = function (
-  headingIcon,
-  headingWelcome,
-  errorMessage
-) {
-  headingIcon.style.display = 'none';
-  headingWelcome.style.display = 'none';
-  errorMessage.style.display = 'none';
-};
-
 export const getJSON = async function (url) {
   try {
     const res = await fetch(url, {

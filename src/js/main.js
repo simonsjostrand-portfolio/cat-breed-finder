@@ -1,7 +1,5 @@
 import { formatName } from './helpers.js';
 import { toggleSpinner } from './helpers.js';
-import { showErrorMessage } from './helpers.js';
-import { hideUIMessages } from './helpers.js';
 import { getJSON } from './helpers.js';
 
 const catRelatives = {
@@ -70,6 +68,14 @@ const catRelatives = {
   turkish_van: 'Turkish Angora',
 };
 
+const vocalityLevels = {
+  1: 'less vocal cats',
+  2: 'not very vocal',
+  3: 'vocal, but not excessively',
+  4: 'quite vocal',
+  5: 'very vocal',
+};
+
 const headingIcon = document.querySelector('.heading-icon');
 const headingWelcome = document.querySelector('.heading-welcome');
 const errorMessage = document.querySelector('.error-message');
@@ -80,7 +86,44 @@ const inputSearchCat = document.getElementById('search-cat');
 
 ////////////////////////////////////////////////////////////////////////
 
-const renderCatDetails = function (cat) {
+const safeText = (value, fallback = 'Unknown') => (value ? value : fallback);
+
+const hideUIMessages = function () {
+  headingIcon.style.display = 'none';
+  headingWelcome.style.display = 'none';
+  errorMessage.style.display = 'none';
+};
+
+const showErrorMessage = function (err) {
+  errorMessage.style.display = 'block';
+  errorMessage.textContent = err.message;
+};
+
+const formatCatDescription = function (cat) {
+  // Get closest cat relative
+  const relative = catRelatives[formatName(cat.name)] || 'unknown';
+
+  const vocality = vocalityLevels[cat.meowing] || '';
+
+  const weight =
+    cat.min_weight && cat.max_weight
+      ? `${cat.min_weight}-${cat.max_weight}lbs`
+      : 'unknown weight';
+
+  const lifespan =
+    cat.min_life_expectancy && cat.max_life_expectancy
+      ? `${cat.min_life_expectancy} to ${cat.max_life_expectancy} years`
+      : 'an unknown lifespan';
+
+  return `
+  The ${cat.name} is ${cat.length === 'Medium' ? 'moderate' : cat.length}, 
+  and weighs around ${weight}. They're ${vocality}. 
+  Their lifespan ranges from ${lifespan}. 
+  Closest relative is ${relative}.
+`;
+};
+
+const renderCatDescription = function (cat) {
   const infoContainer = document.createElement('article');
   const infoIcon = document.createElement('img');
   const info = document.createElement('p');
@@ -92,31 +135,7 @@ const renderCatDetails = function (cat) {
   infoIcon.src = 'src/img/cat-icon.svg';
   infoIcon.alt = 'Cat Icon';
 
-  const vocality =
-    cat.meowing === 1
-      ? 'less vocal cats'
-      : cat.meowing === 2
-      ? 'not very vocal'
-      : cat.meowing === 3
-      ? 'vocal, but not excessively'
-      : cat.meowing === 4
-      ? 'quite vocal'
-      : cat.meowing === 5
-      ? 'very vocal'
-      : '';
-
-  // Get closest cat relative
-  const relative = catRelatives[formatName(cat.name)] || 'unknown';
-
-  info.textContent = `
-      The ${cat.name} is ${
-    cat.length === 'Medium' ? 'moderate' : cat.length
-  }, and weights between ${cat.min_weight}-${
-    cat.max_weight
-  }lbs. They're ${vocality}. Their lifespan ranges from ${
-    cat.min_life_expectancy
-  } to ${cat.max_life_expectancy} years. Closest relative is ${relative}.
-      `;
+  info.textContent = formatCatDescription(cat);
 
   containerCat.insertAdjacentElement('beforeend', infoContainer);
   infoContainer.appendChild(infoIcon);
@@ -144,30 +163,31 @@ const renderCat = function (cat) {
         <img src="${cat.image_link}" alt="A Cat" />
         <h2 class="breed">${cat.name}</h2>
         <ul class="stats-list">
-          <li class="stat"><span>Origin: </span>${
-            cat.origin ? cat.origin : 'Unknown'
-          }</li>
+          <li class="stat"><span>Origin: </span>${safeText(cat.origin)}</li>
           <li class="stat"><span>Intelligence: </span>${
-            cat.intelligence ? cat.intelligence + '/5' : 'Unknown'
-          }</li>
+            cat.intelligence ? `${cat.intelligence}/5` : 'Unknown'
+          }
+          </li>
           <li class="stat"><span>Family-Friendly: </span>${
             familyRating ? heartEmoji : 'Unknown'
-          }</li>
+          }
+          </li>
           <li class="stat"><span>Playfulness: </span>${
             playRating ? playEmoji : 'Unknown'
-          }</li>
+          }
+          </li>
         </ul>
       </article>`;
 
     toggleSpinner(false, spinner);
     containerCat.insertAdjacentHTML('afterbegin', html);
 
-    renderCatDetails(cat);
+    renderCatDescription(cat);
   });
 };
 
-// GET CAT DATA
-const fetchCatData = async function (breed) {
+const loadCatProfile = async function (breed) {
+  toggleSpinner(true, spinner);
   try {
     const cat = await getJSON(
       `https://api.api-ninjas.com/v1/cats?name=${breed}`
@@ -180,25 +200,23 @@ const fetchCatData = async function (breed) {
 
     renderCat(cat[0]);
   } catch (err) {
+    showErrorMessage(err);
+  } finally {
     toggleSpinner(false, spinner);
-    showErrorMessage(err, errorMessage);
   }
 };
 
-// Event handler
+// Handler
 const handleSubmit = function (e) {
   e.preventDefault();
 
-  hideUIMessages(headingIcon, headingWelcome, errorMessage);
-  toggleSpinner(true, spinner);
-  containerCat.innerHTML = '';
-
-  // Get search query
   const query = inputSearchCat.value.trim();
   if (!query) return;
 
   formSearchCat.reset();
-  fetchCatData(query);
+  containerCat.innerHTML = '';
+  hideUIMessages();
+  loadCatProfile(query);
 };
 
 // Event listener
